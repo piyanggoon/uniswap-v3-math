@@ -26,6 +26,7 @@ pub fn most_significant_bit(x: U256) -> Result<u8, UniswapV3MathError> {
     
     let mut x = x;
     let mut r = 0 as u8;
+    
     if x >= M_128 {
         x >>= 128;
         r += 128;

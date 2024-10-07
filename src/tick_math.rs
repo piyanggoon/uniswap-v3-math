@@ -2,32 +2,47 @@ use alloy::primitives::{I256, U256};
 use std::ops::{BitOr, Neg, Shl, Shr};
 
 use crate::{
-    error::UniswapV3MathError, U256_1, U256_1024, U256_127, U256_128, U256_131072, U256_15,
-    U256_16, U256_16384, U256_2, U256_2048, U256_255, U256_256, U256_262144, U256_3, U256_32,
-    U256_32768, U256_4, U256_4096, U256_5, U256_512, U256_524288, U256_6, U256_64, U256_65536,
-    U256_7, U256_8, U256_8192, U256_MAX_TICK,
+    error::UniswapV3MathError, I256_128, U256_1, U256_1024, U256_127, U256_128, U256_131072, U256_16, U256_16384, U256_2, U256_2048, U256_256, U256_262144, U256_3, U256_32, U256_32768, U256_4, U256_4096, U256_5, U256_512, U256_524288, U256_6, U256_64, U256_65536, U256_7, U256_8, U256_8192, U256_MAX_TICK
 };
 
 pub const MIN_TICK: i32 = -887272;
 pub const MAX_TICK: i32 = -MIN_TICK;
 
 pub const MIN_SQRT_RATIO: U256 = U256::from_limbs([4295128739, 0, 0, 0]);
-pub const MAX_SQRT_RATIO: U256 =
-    U256::from_limbs([6743328256752651558, 17280870778742802505, 4294805859, 0]);
+pub const MAX_SQRT_RATIO: U256 = U256::from_limbs([6743328256752651558, 17280870778742802505, 4294805859, 0]);
 
 pub const SQRT_10001: I256 = I256::from_raw(U256::from_limbs([11745905768312294533, 13863, 0, 0]));
-pub const TICK_LOW: I256 = I256::from_raw(U256::from_limbs([
-    6552757943157144234,
-    184476617836266586,
-    0,
-    0,
-]));
-pub const TICK_HIGH: I256 = I256::from_raw(U256::from_limbs([
-    4998474450511881007,
-    15793544031827761793,
-    0,
-    0,
-]));
+pub const TICK_LOW: I256 = I256::from_raw(U256::from_limbs([6552757943157144234, 184476617836266586, 0, 0]));
+pub const TICK_HIGH: I256 = I256::from_raw(U256::from_limbs([4998474450511881007, 15793544031827761793, 0, 0]));
+
+const ABS_2: U256 = U256::from_limbs([6459403834229662010, 18444899583751176498, 0, 0]);
+const ABS_4: U256 = U256::from_limbs([17226890335427755468, 18443055278223354162, 0, 0]);
+const ABS_8: U256 = U256::from_limbs([2032852871939366096, 18439367220385604838, 0, 0]);
+const ABS_16: U256 = U256::from_limbs([14545316742740207172, 18431993317065449817, 0, 0]);
+const ABS_32: U256 = U256::from_limbs([5129152022828963008, 18417254355718160513, 0, 0]);
+const ABS_64: U256 = U256::from_limbs([4894419605888772193, 18387811781193591352, 0, 0]);
+const ABS_128: U256 = U256::from_limbs([1280255884321894483, 18329067761203520168, 0, 0]);
+const ABS_256: U256 = U256::from_limbs([15924666964335305636, 18212142134806087854, 0, 0]);
+const ABS_512: U256 = U256::from_limbs([8010504389359918676, 17980523815641551639, 0, 0]);
+const ABS_1024: U256 = U256::from_limbs([10668036004952895731, 17526086738831147013, 0, 0]);
+const ABS_2048: U256 = U256::from_limbs([4878133418470705625, 16651378430235024244, 0, 0]);
+const ABS_4096: U256 = U256::from_limbs([9537173718739605541, 15030750278693429944, 0, 0]);
+const ABS_8192: U256 = U256::from_limbs([9972618978014552549, 12247334978882834399, 0, 0]);
+const ABS_16384: U256 = U256::from_limbs([10428997489610666743, 8131365268884726200, 0, 0]);
+const ABS_32768: U256 = U256::from_limbs([9305304367709015974, 3584323654723342297, 0, 0]);
+const ABS_65536: U256 = U256::from_limbs([14301143598189091785, 696457651847595233, 0, 0]);
+const ABS_131072: U256 = U256::from_limbs([7393154844743099908, 26294789957452057, 0, 0]);
+const ABS_262144: U256 = U256::from_limbs([2209338891292245656, 37481735321082, 0, 0]);
+const ABS_524288: U256 = U256::from_limbs([10518117631919034274, 76158723, 0, 0]);
+
+const MSB_128: U256 = U256::from_limbs([18446744073709551615, 18446744073709551615, 0, 0]);
+const MSB_64: U256 = U256::from_limbs([18446744073709551615, 0, 0, 0]);
+const MSB_32: U256 = U256::from_limbs([4294967295, 0, 0, 0]);
+const MSB_16: U256 = U256::from_limbs([65535, 0, 0, 0]);
+const MSB_8: U256 = U256::from_limbs([255, 0, 0, 0]);
+const MSB_4: U256 = U256::from_limbs([15, 0, 0, 0]);
+const MSB_2: U256 = U256::from_limbs([3, 0, 0, 0]);
+const MSB_1: U256 = U256::from_limbs([1, 0, 0, 0]);
 
 pub fn get_sqrt_ratio_at_tick(tick: i32) -> Result<U256, UniswapV3MathError> {
     let abs_tick = if tick < 0 {
@@ -47,65 +62,61 @@ pub fn get_sqrt_ratio_at_tick(tick: i32) -> Result<U256, UniswapV3MathError> {
     };
 
     if !(abs_tick & U256_2).is_zero() {
-        ratio = (ratio * U256::from_limbs([6459403834229662010, 18444899583751176498, 0, 0])) >> 128
+        ratio = (ratio * ABS_2) >> 128
     }
     if !(abs_tick & U256_4).is_zero() {
-        ratio =
-            (ratio * U256::from_limbs([17226890335427755468, 18443055278223354162, 0, 0])) >> 128
+        ratio = (ratio * ABS_4) >> 128
     }
     if !(abs_tick & U256_8).is_zero() {
-        ratio = (ratio * U256::from_limbs([2032852871939366096, 18439367220385604838, 0, 0])) >> 128
+        ratio = (ratio * ABS_8) >> 128
     }
     if !(abs_tick & U256_16).is_zero() {
-        ratio =
-            (ratio * U256::from_limbs([14545316742740207172, 18431993317065449817, 0, 0])) >> 128
+        ratio = (ratio * ABS_16) >> 128
     }
     if !(abs_tick & U256_32).is_zero() {
-        ratio = (ratio * U256::from_limbs([5129152022828963008, 18417254355718160513, 0, 0])) >> 128
+        ratio = (ratio * ABS_32) >> 128
     }
     if !(abs_tick & U256_64).is_zero() {
-        ratio = (ratio * U256::from_limbs([4894419605888772193, 18387811781193591352, 0, 0])) >> 128
+        ratio = (ratio * ABS_64) >> 128
     }
     if !(abs_tick & U256_128).is_zero() {
-        ratio = (ratio * U256::from_limbs([1280255884321894483, 18329067761203520168, 0, 0])) >> 128
+        ratio = (ratio * ABS_128) >> 128
     }
     if !(abs_tick & U256_256).is_zero() {
-        ratio =
-            (ratio * U256::from_limbs([15924666964335305636, 18212142134806087854, 0, 0])) >> 128
+        ratio = (ratio * ABS_256) >> 128
     }
     if !(abs_tick & U256_512).is_zero() {
-        ratio = (ratio * U256::from_limbs([8010504389359918676, 17980523815641551639, 0, 0])) >> 128
+        ratio = (ratio * ABS_512) >> 128
     }
     if !(abs_tick & U256_1024).is_zero() {
-        ratio =
-            (ratio * U256::from_limbs([10668036004952895731, 17526086738831147013, 0, 0])) >> 128
+        ratio = (ratio * ABS_1024) >> 128
     }
     if !(abs_tick & U256_2048).is_zero() {
-        ratio = (ratio * U256::from_limbs([4878133418470705625, 16651378430235024244, 0, 0])) >> 128
+        ratio = (ratio * ABS_2048) >> 128
     }
     if !(abs_tick & U256_4096).is_zero() {
-        ratio = (ratio * U256::from_limbs([9537173718739605541, 15030750278693429944, 0, 0])) >> 128
+        ratio = (ratio * ABS_4096) >> 128
     }
     if !(abs_tick & U256_8192).is_zero() {
-        ratio = (ratio * U256::from_limbs([9972618978014552549, 12247334978882834399, 0, 0])) >> 128
+        ratio = (ratio * ABS_8192) >> 128
     }
     if !(abs_tick & U256_16384).is_zero() {
-        ratio = (ratio * U256::from_limbs([10428997489610666743, 8131365268884726200, 0, 0])) >> 128
+        ratio = (ratio * ABS_16384) >> 128
     }
     if !(abs_tick & U256_32768).is_zero() {
-        ratio = (ratio * U256::from_limbs([9305304367709015974, 3584323654723342297, 0, 0])) >> 128
+        ratio = (ratio * ABS_32768) >> 128
     }
     if !(abs_tick & U256_65536).is_zero() {
-        ratio = (ratio * U256::from_limbs([14301143598189091785, 696457651847595233, 0, 0])) >> 128
+        ratio = (ratio * ABS_65536) >> 128
     }
     if !(abs_tick & U256_131072).is_zero() {
-        ratio = (ratio * U256::from_limbs([7393154844743099908, 26294789957452057, 0, 0])) >> 128
+        ratio = (ratio * ABS_131072) >> 128
     }
     if !(abs_tick & U256_262144).is_zero() {
-        ratio = (ratio * U256::from_limbs([2209338891292245656, 37481735321082, 0, 0])) >> 128
+        ratio = (ratio * ABS_262144) >> 128
     }
     if !(abs_tick & U256_524288).is_zero() {
-        ratio = (ratio * U256::from_limbs([10518117631919034274, 76158723, 0, 0])) >> 128
+        ratio = (ratio * ABS_524288) >> 128
     }
 
     if tick > 0 {
@@ -129,7 +140,7 @@ pub fn get_tick_at_sqrt_ratio(sqrt_price_x_96: U256) -> Result<i32, UniswapV3Mat
     let mut r = ratio;
     let mut msb = U256::ZERO;
 
-    let mut f = if r > U256::from_limbs([18446744073709551615, 18446744073709551615, 0, 0]) {
+    let mut f = if r > MSB_128 {
         U256_1.shl(U256_7)
     } else {
         U256::ZERO
@@ -137,7 +148,7 @@ pub fn get_tick_at_sqrt_ratio(sqrt_price_x_96: U256) -> Result<i32, UniswapV3Mat
     msb = msb.bitor(f);
     r = r.shr(f);
 
-    f = if r > U256::from_limbs([18446744073709551615, 0, 0, 0]) {
+    f = if r > MSB_64 {
         U256_1.shl(U256_6)
     } else {
         U256::ZERO
@@ -145,7 +156,7 @@ pub fn get_tick_at_sqrt_ratio(sqrt_price_x_96: U256) -> Result<i32, UniswapV3Mat
     msb = msb.bitor(f);
     r = r.shr(f);
 
-    f = if r > U256::from_limbs([4294967295, 0, 0, 0]) {
+    f = if r > MSB_32 {
         U256_1.shl(U256_5)
     } else {
         U256::ZERO
@@ -153,7 +164,7 @@ pub fn get_tick_at_sqrt_ratio(sqrt_price_x_96: U256) -> Result<i32, UniswapV3Mat
     msb = msb.bitor(f);
     r = r.shr(f);
 
-    f = if r > U256::from_limbs([65535, 0, 0, 0]) {
+    f = if r > MSB_16 {
         U256_1.shl(U256_4)
     } else {
         U256::ZERO
@@ -161,7 +172,7 @@ pub fn get_tick_at_sqrt_ratio(sqrt_price_x_96: U256) -> Result<i32, UniswapV3Mat
     msb = msb.bitor(f);
     r = r.shr(f);
 
-    f = if r > U256_255 {
+    f = if r > MSB_8 {
         U256_1.shl(U256_3)
     } else {
         U256::ZERO
@@ -169,7 +180,7 @@ pub fn get_tick_at_sqrt_ratio(sqrt_price_x_96: U256) -> Result<i32, UniswapV3Mat
     msb = msb.bitor(f);
     r = r.shr(f);
 
-    f = if r > U256_15 {
+    f = if r > MSB_4 {
         U256_1.shl(U256_2)
     } else {
         U256::ZERO
@@ -177,7 +188,7 @@ pub fn get_tick_at_sqrt_ratio(sqrt_price_x_96: U256) -> Result<i32, UniswapV3Mat
     msb = msb.bitor(f);
     r = r.shr(f);
 
-    f = if r > U256_3 {
+    f = if r > MSB_2 {
         U256_1.shl(U256_1)
     } else {
         U256::ZERO
@@ -185,7 +196,7 @@ pub fn get_tick_at_sqrt_ratio(sqrt_price_x_96: U256) -> Result<i32, UniswapV3Mat
     msb = msb.bitor(f);
     r = r.shr(f);
 
-    f = if r > U256_1 { U256_1 } else { U256::ZERO };
+    f = if r > MSB_1 { U256_1 } else { U256::ZERO };
 
     msb = msb.bitor(f);
 
@@ -195,13 +206,12 @@ pub fn get_tick_at_sqrt_ratio(sqrt_price_x_96: U256) -> Result<i32, UniswapV3Mat
         ratio.shl(U256_127 - msb)
     };
 
-    let mut log_2: I256 = (I256::from_raw(msb) - I256::from_limbs([128, 0, 0, 0])).shl(64);
+    let mut log_2: I256 = (I256::from_raw(msb) - I256_128).shl(64);
 
-    for i in (51..=63).rev() {
+    for i in 0..14 {
         r = r.overflowing_mul(r).0.shr(U256_127);
         let f: U256 = r.shr(128);
-        log_2 = log_2.bitor(I256::from_raw(f.shl(i)));
-
+        log_2 = log_2.bitor(I256::from_raw(f.shl(63 - i)));
         r = r.shr(f);
     }
 
@@ -212,9 +222,7 @@ pub fn get_tick_at_sqrt_ratio(sqrt_price_x_96: U256) -> Result<i32, UniswapV3Mat
     let log_sqrt10001 = log_2.wrapping_mul(SQRT_10001);
 
     let tick_low = ((log_sqrt10001 - TICK_LOW) >> 128_u8).low_i32();
-
     let tick_high = ((log_sqrt10001 + TICK_HIGH) >> 128_u8).low_i32();
-
     let tick = if tick_low == tick_high {
         tick_low
     } else if get_sqrt_ratio_at_tick(tick_high)? <= sqrt_price_x_96 {

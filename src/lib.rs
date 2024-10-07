@@ -1,4 +1,4 @@
-use alloy::primitives::U256;
+use alloy::primitives::{I256, U256};
 
 pub mod bit_math;
 pub mod error;
@@ -41,3 +41,5 @@ const U256_262144: U256 = U256::from_limbs([262144, 0, 0, 0]);
 const U256_524288: U256 = U256::from_limbs([524288, 0, 0, 0]);
 
 const U256_MAX_TICK: U256 = U256::from_limbs([887272, 0, 0, 0]);
+
+const I256_128: I256 = I256::from_limbs([128, 0, 0, 0]);

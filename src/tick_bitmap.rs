@@ -45,13 +45,10 @@ pub fn next_initialized_tick_within_one_word(
 
     if lte {
         let (word_pos, bit_pos) = position(compressed);
-
         let mask = (U256_1 << bit_pos) - U256_1 + (U256_1 << bit_pos);
-
         let masked = *tick_bitmap.get(&word_pos).unwrap_or(&U256::ZERO) & mask;
 
         let initialized = !masked.is_zero();
-
         let next = if initialized {
             (compressed
                 - (bit_pos
@@ -65,13 +62,10 @@ pub fn next_initialized_tick_within_one_word(
         Ok((next, initialized))
     } else {
         let (word_pos, bit_pos) = position(compressed + 1);
-
         let mask = !((U256_1 << bit_pos) - U256_1);
-
         let masked = *tick_bitmap.get(&word_pos).unwrap_or(&U256::ZERO) & mask;
 
         let initialized = !masked.is_zero();
-
         let next = if initialized {
             (compressed
                 + 1
@@ -189,7 +183,7 @@ pub async fn next_initialized_tick_within_one_word_from_provider<P: Provider>(
 
 //Computes the position in the mapping where the initialized bit for a tick lives
 pub fn position(tick: i32) -> (i16, u8) {
-    ((tick >> 8) as i16, (tick % 256) as u8)
+    ((tick >> 8) as i16, (tick & 0xFF) as u8)
 }
 
 #[cfg(test)]
