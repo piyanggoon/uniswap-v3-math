@@ -215,12 +215,7 @@ pub fn get_tick_at_sqrt_ratio(sqrt_price_x_96: U256) -> Result<i32, UniswapV3Mat
         r = r.shr(f);
     }
 
-    r = r.overflowing_mul(r).0.shr(U256_127);
-    let f: U256 = r.shr(128);
-    log_2 = log_2.bitor(I256::from_raw(f.shl(50)));
-
     let log_sqrt10001 = log_2.wrapping_mul(SQRT_10001);
-
     let tick_low = ((log_sqrt10001 - TICK_LOW) >> 128_u8).low_i32();
     let tick_high = ((log_sqrt10001 + TICK_HIGH) >> 128_u8).low_i32();
     let tick = if tick_low == tick_high {
